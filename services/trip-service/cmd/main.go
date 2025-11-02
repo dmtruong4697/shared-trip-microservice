@@ -22,7 +22,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
+	
 	go func() {
 		sigCh := make(chan os.Signal, 1)
 		signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
@@ -35,21 +35,21 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// starting gRPC server
+	// Starting the gRPC server
 	grpcServer := grpcserver.NewServer()
 	grpc.NewGRPCHandler(grpcServer, svc)
 
-	log.Printf("starting grpc server trip service on port &s", lis.Addr().String())
+	log.Printf("Starting gRPC server Trip service on port %s", lis.Addr().String())
 
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			log.Printf("failed to serve grpc server: %v", err)
+			log.Printf("failed to serve: %v", err)
 			cancel()
 		}
 	}()
 
-	//wait for shutdown signal
-	<- ctx.Done()
-	log.Println("shutting down the serve: %v", err)
+	// wait for the shutdown signal
+	<-ctx.Done()
+	log.Println("Shutting down the server...")
 	grpcServer.GracefulStop()
 }

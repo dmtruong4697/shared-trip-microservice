@@ -1,8 +1,6 @@
 package types
 
-import (
-	pb "ride-sharing/shared/proto/trip"
-)
+import pb "ride-sharing/shared/proto/trip"
 
 type OsrmApiResponse struct {
 	Routes []struct {
@@ -14,7 +12,7 @@ type OsrmApiResponse struct {
 	} `json:"routes"`
 }
 
-func (o *OsrmApiResponse) ToProco() *pb.Route {
+func (o *OsrmApiResponse) ToProto() *pb.Route {
 	route := o.Routes[0]
 	geometry := route.Geometry.Coordinates
 	coordinates := make([]*pb.Coordinate, len(geometry))
@@ -33,5 +31,17 @@ func (o *OsrmApiResponse) ToProco() *pb.Route {
 		},
 		Distance: route.Distance,
 		Duration: route.Duration,
+	}
+}
+
+type PricingConfig struct {
+	PricePerUnitOfDistance float64
+	PricingPerMinute       float64
+}
+
+func DefaultPricingConfig() *PricingConfig {
+	return &PricingConfig{
+		PricePerUnitOfDistance: 1.5,
+		PricingPerMinute:       0.25,
 	}
 }

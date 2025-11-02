@@ -22,7 +22,6 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /trip/preview", enableCORS(handleTripPreview))
-	mux.HandleFunc("POST /trip/start", enableCORS(handleTripStart))
 	mux.HandleFunc("/ws/drivers", handleDriversWebSocket)
 	mux.HandleFunc("/ws/riders", handleRidersWebSocket)
 
@@ -30,6 +29,7 @@ func main() {
 		Addr:    httpAddr,
 		Handler: mux,
 	}
+
 	serverErrors := make(chan error, 1)
 
 	go func() {
@@ -42,16 +42,16 @@ func main() {
 
 	select {
 	case err := <-serverErrors:
-		log.Printf("error staring the server: %v", err)
+		log.Printf("Error starting the server: %v", err)
 
 	case sig := <-shutdown:
-		log.Printf("server is shuting down due to %v signal", sig)
+		log.Printf("Server is shutting down due to %v signal", sig)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		if err := server.Shutdown(ctx); err != nil {
-			log.Printf("could not stop server gracefully: %v", err)
+			log.Printf("Could not stop the server gracefully: %v", err)
 			server.Close()
 		}
 	}

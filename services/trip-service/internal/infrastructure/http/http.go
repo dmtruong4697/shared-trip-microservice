@@ -21,25 +21,18 @@ type previewTripRequest struct {
 func (s *HttpHandler) HandleTripPreview(w http.ResponseWriter, r *http.Request) {
 	var reqBody previewTripRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		http.Error(w, "failed parse Json data", http.StatusBadRequest)
+		http.Error(w, "failed to parse JSON data", http.StatusBadRequest)
 		return
 	}
 
-	// fare := &domain.RideFareModel{
-	// 	UserID: "42",
-	// }
-
 	ctx := r.Context()
-	// t, err := s.Service.CreateTrip(ctx, fare)
+
 	t, err := s.Service.GetRoute(ctx, &reqBody.Pickup, &reqBody.Destination)
 	if err != nil {
 		log.Println(err)
 	}
 
-	log.Println(t)
-
 	writeJSON(w, http.StatusOK, t)
-
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) error {
